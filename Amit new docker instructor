@@ -1,0 +1,383 @@
+Amit new docker instructor  Notes
+
+Docker 
+
+#### Demo 1 #######
+Update
+Use the following command to install packages to allow the apt to use a repository over HTTPS:
+Use the following curl command to add Docker’s official GPG key
+Use the following command to set up a stable repository
+
+Sudo cat /etc/*rel*    // To check OS Version
+Whoami    // User session
+sudo apt-get update     
+sudo apt-get install apt-transport-https ca-certificates curl software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+sudo apt-get install docker-ce
+docker –version
+sudo docker run hello-world
+
+
+To Remove 
+sudo apt-get purge docker-ce docker-ce-cli containerd.io
+sudo rm -rf /var/lib/docker
+
+To enable docker service 
+Sudo systemctl status docker
+Sudo systemctl enable docker
+
+Create a daemon.json configuration file to configure the Daemon flags and environment variables
+sudo vi /etc/docker/daemon.json
+{
+        "data-root":"/mnt/docker-data",
+        "storage-driver":"overlay2"
+}
+
+To exit from vi editor Press Esc :wq
+
+
+Diagrams : 
+
+
+
+
+
+
+
+
+
+13-March-2022 
+##### Demo #####
+To list the images
+sudo docker images
+
+To pull docker image    
+sudo docker pull ubuntu
+sudo docker images
+
+Create container and start
+sudo docker run -dt ubuntu 
+
+To verify the status of container
+sudo docker ps
+
+To Stop container
+sudo docker stop trusting_jemison
+sudo docker ps
+sudo docker ps -a
+
+To remove the continer 
+sudo docker container rm trusting_jemison
+sudo docker ps -a
+sudo docker images 
+
+To remove image 
+sudo docker image rm ubuntu
+sudo docker images 
+
+
+Create 2 containers using centos image, One container is in running state and other is in stop state. 
+
+Demo 
+   70  sudo docker pull centos
+   71  sudo docker images
+   72  sudo docker run -it centos bash
+   73  sudo docker ps 
+   74  sudo docker ps -a
+   76  sudo docker container start hardcore_maxwell
+   77  sudo docker ps -a
+   78* sudo docker exec -it hardcore_maxwell bashsudo
+   79  sudo docker ps -a
+To Rename the container
+Syntax : docker rename <old-name container > <new-name container>
+   80  sudo docker rename hardcore_maxwell my-cont
+   81  sudo docker ps -a
+
+
+
+Demo - Nginx
+sudo docker pull nginx 
+sudo docker images
+sudo docker run -dt -p 8080:80 nginx 
+sudo docker ps
+curl localhost:8080
+
+Demo - Dockerfile
+ #mkdir test
+ #ls
+ #cd test/
+#pwd
+# vi Dockerfile
+FROM ubuntu
+RUN apt-get update
+RUN apt-get install -y nginx
+COPY index.html /var/www/html
+CMD nginx -g 'daemon off;'
+:wq
+
+ #cat Dockerfile 
+ 
+# vi index.html
+<html>
+        <b>Welcome Nginx and Hello from  Simplilearn</b>
+</html>
+
+# sudo docker build .
+# sudo docker images
+#sudo docker run -dt -p 8081:80 8123d685c0e8     //image ID
+#sudo docker ps
+#curl localhost:8081
+
+
+Date : 19-March-2022
+Demo : Commands 
+
+sudo docker images
+sudo docker inspect centos
+sudo docker images
+sudo docker run -it --name=myconatiner centos bash
+sudo docker ps -a
+
+sudo docker start myconatiner
+sudo docker rename myconatiner new-cont
+sudo docker ps 
+
+ sudo docker images
+
+Demo 2 : Dockerfile
+ mkdir myimg
+ ls
+ pwd
+  ls
+ cd myimg/
+ ls
+ vi Dockerfile
+FROM centos
+RUN echo "Hello Simplilearn" > /root/test1.txt
+COPY myfile.txt /root/test2.txt
+RUN mkdir /root/simplilearn
+:wq!  //Save and exit
+
+ cat Dockerfile 
+echo "Hello Good Eveningcat Dockerfile  This is myfile" > myfile.txt
+ cat myfile.txt 
+ sudo docker build -t myimg .
+
+sudo docker images
+sudo docker run -it myimg bash 
+sudo docker ps -a
+sudo docker start confident_wozniak
+sudo docker ps -a
+sudo docker exec -it confident_wozniak bash
+
+
+
+Cont - my-cont ⇒ Test.txt/configuration  ⇒ My-Image 
+
+Myimage ===> my-cont2 ⇒ apache2/configuration ⇒ my-image2
+
+
+#### Convert container into image ####
+Syntax : sudo docker commit <continer-name> <image-name>
+sudo docker commit confident_wozniak mytestimg
+sudo docker images
+sudo docker run -it --name=new-cont1 mytestimg bash
+sudo docker ps -a
+sudo docker commit new-cont1 mytestimg-new
+sudo docker images
+sudo docker run -it --name=new-cont2  mytestimg-new bash
+
+
+#### Demo - Image Tagging #####
+
+sudo docker pull nginx:latest
+sudo docker images
+Sudo docker tag <image-ID/Image-name> demo/<image-name>:tag 
+## Tag by image ID
+sudo docker tag f2f70adc5d89 demo/naginx_img:version1.0
+sudo docker images
+## Tag by image name
+sudo docker tag nginx demo/naginx_img1:version1.1
+sudo docker images
+
+
+
+### Demo -  Push Docker image to local registry 
+ sudo docker images
+ sudo docker ps 
+## Create docker registry named as registry (Container name = registry)
+sudo docker run -d -p 5000:5000 --restart=always --name registry registry:2
+sudo docker ps 
+## Pull ubuntu image from Docker hub
+sudo docker pull ubuntu:16.04
+sudo docker images
+
+## Tag ubuntu image as “localhost:5000/myubuntu”
+ sudo docker tag ubuntu:16.04 localhost:5000/my-ubuntu
+ sudo docker images
+
+## Push newly tag ubuntu image to local registry 
+sudo docker push localhost:5000/my-ubuntu
+sudo docker images
+## Remove both images ubuntu & myubuntu
+sudo docker image remove ubuntu:16.04
+ sudo docker image remove localhost:5000/my-ubuntu
+ sudo docker images
+
+## Pull image from your local registry
+sudo docker pull localhost:5000/my-ubuntu
+sudo docker ps
+sudo docker images
+
+
+#### Demo - Push Docker image to Docker Hub
+sudo docker images
+## Login into docker hub using below command 
+sudo docker login     
+## username & password for your docker hub
+
+
+sudo docker images
+## sudo docker tag <image name> riistech2021/my-firstrepo:<tag> 
+sudo docker tag mytestimg-new riistech2021/my-firstrepo:cent-new
+sudo docker images
+## Push docker cent-new image to docker hub
+sudo docker push riistech2021/my-firstrepo:cent-new
+
+
+Date : 20-March-2022
+
+### Demo - Push Image to Docker Hub Python ####
+
+#mkdir pythonapp
+#cd pythonapp
+#vi app.py
+from flask import Flask
+import os
+import socketapp = Flask(__name__)@app.route(“/”)def hello():
+html = “<h3>Hello {name}!</h3>” \
+            “<b>Hostname:</b> {hostname}<br/>”
+return html.format(name=os.getenv(“NAME”, “world”), hostname=socket.gethostname()) if __name__ == “__main__”:
+     app.run(host=’0.0.0.0', port=80)
+
+
+#vi requirements.txt
+Flask
+
+#vi Dockerfile
+FROM python
+WORKDIR /app
+ADD . /app
+RUN pip install -r requirements.txt
+EXPOSE 80
+ENV NAME world
+CMD [“python”, “app.py”]
+
+#sudo docker build -t python_image .
+#sudo docker images
+#sudo docker login
+#sudo docker push USERNAME/python_image:version1
+Example :
+#sudo docker tag python_image riistech2021/my-firstrepo:python_image
+
+
+#sudo docker build -t python_image .
+
+###########################################################
+
+
+#### Demo Instructions 
+Vi Dockerfile
+FROM centos 
+LABEL class=simplilearn
+ADD https://<image-URL> /docker.png
+
+sudo docker build -t new-img .
+
+
+### Demo - ADD instruction
+  384  touch test1
+  385  touch test2
+  386  echo "Hello file1 test1" > test1 
+  387  echo "Hello file2 test2" > test2 
+  388  tar -cvf test3.tar test2
+  389  ls
+  390  vi Dockerfile
+FROM centos
+COPY test1 /tmp
+ADD test3.tar /tmp
+:wq!
+  391  sudo docker build -t myimg1 .
+
+
+#### Demo - Workdir instruction
+#Vi Dockerfile
+FROM ubuntu
+RUN mkdir /mydata
+WORKDIR /mydata
+RUN touch file1 
+COPY file2 /mydata
+
+#echo "Hello File2" > file2
+#sudo docker build -t demo-workdir1 .
+
+### Remove all Containers 
+sudo docker container prune
+## Remove all images 
+sudo docker image prune -a
+
+### Docker search 
+#sudo docker search <image-name>
+#sudo docker search ubuntu
+
+
+############# Networking #############
+
+### Demo 1 - Create bridge Network
+ sudo docker network ls
+ sudo docker network create mynetwork1
+ sudo docker network ls
+sudo docker inspect mynetwork1
+
+
+### Demo 2 - Create user-defined bridge network 
+sudo docker network create my-net1
+sudo docker network ls
+sudo docker create --name=my-nginx --network my-net1 --publish 8080:80 nginx:latest
+sudo docker ps -a
+sudo docker container start my-nginx
+sudo docker network connect my-net1 my-nginx 
+sudo docker container inspect my-nginx
+ping 172.19.0.2
+curl 172.19.0.2:80
+curl localhost:80
+curl localhost:8080
+ifconfig 
+
+
+### Demo 3 - Host Network
+
+sudo docker network ls
+sudo docker run -d --network host --name nginx_host nginx:latest
+sudo docker ps
+
+sudo docker container inspect nginx_host
+curl localhost:80
+netstat -tunlp | grep 80
+sudo netstat -tunlp | grep 80
+
+
+#### Demo 4.1 - Macvlan Network 
+  524  sudo docker network create -d macvlan -o parent=eth0 mac-vnet1
+  525  sudo docker network ls
+  526  sudo docker network inspect mac-vnet1
+  527  sudo docker run --network=mac-vnet1 -itd --name centos1 centos bash
+  528  sudo docker ps
+  529  sudo docker container inspect centos1
+
+
+#### Demo 4.2 Macvlan Network 
+
+
+
